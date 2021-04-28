@@ -1,0 +1,69 @@
+version: '2'
+services:
+    default: 
+        build: 
+            context: ./
+            args: 
+                - "start_type=default"
+        restart: always
+        #image: mysql:latest
+        container_name: mysql_default
+        command: [
+            '--max_connections=3000'
+        ]
+        #volumes: 
+            #- /Users/xiaoyi/WorkSpace/docker_data/mysql:/var/lib/mysql
+        environment:
+            - "MYSQL_ROOT_PASSWORD=xiaoyi"
+            - "MYSQL_DATABASE=mydb"
+            - "TZ=Asia/Shanghai"
+        ports: 
+            - 3307:3306
+    master: 
+        build: 
+            context: ./
+            args: 
+                - "start_type=master"
+        restart: always
+        #image: mysql:latest
+        container_name: mysql_master 
+        command: [
+            '--max_connections=3000'
+        ]
+        #volumes: 
+            #- /Users/xiaoyi/WorkSpace/docker_data/master:/var/lib/mysql
+        environment:
+            - "MYSQL_ROOT_PASSWORD=xiaoyi"
+            - "MYSQL_DATABASE=mydb"
+            - "TZ=Asia/Shanghai"
+        ports: 
+            - 3308:3306
+        networks: 
+            - backend
+    slave: 
+        build: 
+            context: ./
+            args: 
+                - "start_type=slave"
+        restart: always
+        #image: mysql:latest
+        container_name: mysql_slave 
+        command: [
+            '--max_connections=3000'
+        ]
+        #volumes: 
+            #- /Users/xiaoyi/WorkSpace/docker_data/slave:/var/lib/mysql
+        environment:
+            - "MYSQL_ROOT_PASSWORD=xiaoyi"
+            - "MYSQL_DATABASE=mydb"
+            - "TZ=Asia/Shanghai"
+        ports: 
+            - 3309:3306
+        networks: 
+            - backend
+        depends_on: 
+            - master
+
+networks: 
+    backend:
+        driver: bridge
